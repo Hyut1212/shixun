@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>课程详细介绍</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .course {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .course .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .course .description {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .course .instructor {
+            font-weight: bold;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .course .price {
+            font-size: 18px;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .course .enroll-button {
+            display: block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .course .enroll-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+        }
+
+        #comments {
+            margin-top: 20px;
+        }
+
+        .comment {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .comment .author {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .comment .date {
+            font-style: italic;
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .comment .content {
+            margin-top: 10px;
+            color: #555;
+        }
+
+        #comment-form {
+            margin-top: 40px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        #comment-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #comment-form input[type="text"],
+        #comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+
+        #comment-form button[type="submit"] {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #comment-form button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>评论页面</h1>
+
+    <div id="comments"></div>
+
+    <h2>发表评论</h2>
+    <form id="comment-form">
+        <div>
+            <label for="name-input">昵称：</label>
+            <input type="text" id="userName" name="name" required>
+        </div>
+        <div>
+            <label for="comment-input">评论内容：</label>
+            <textarea id="comment-input" name="comment" required></textarea>
+        </div>
+        <button type="button" onclick="addComment()">发表评论</button>
+        <table class="table" id="tbRecord">
+            <thead>
+                <tr>
+                    <th>用户名称</th>
+                    <th>评论内容</th>
+                   
+                </tr>
+            </thead>
+            <tbody id="my-tbody">
+            </tbody>
+
+        </table>
+    </form>
+
+    <script src="./js/jquery-1.7.2.min.js"></script>
+    <script>
+                var courseId = GetQueryString("course_id");
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        function addComment() {
+            let search = location.search;
+            var params = {};
+            if (search.indexOf("course_id") > 0) {
+                params.courseId = search.substring(search.indexOf("=") + 1);
+            }
+            params.content = $("#comment-input").val();
+            params.userName = $("#userName").val();
+            alert(JSON.stringify(params))
+            // params.courseType = $("#courseType").val();
+            // params.payType = $("#payType").val();
+            //userid 和course id
+            // 数据校验
+            // 校验参数
+            // if (params.courseName == "") {
+            //     return;
+            // }
+
+            // if (params.teacherName == "") {
+            //     alert("老师名字不能为空");
+            //     return;
+            // }
+
+            // if (params.courseType == "") {
+            //     alert("课程类型不能为空");
+            //     return;
+            // }
+
+            // if (params.payType == "") {
+            //     alert("付费类型不能为空");
+            //     return;
+            // }
+
+            // 将数据发送到后台
+            $.ajax({
+                url: "http://localhost:8080/addComment",
+                type: "post",
+                data: JSON.stringify(params),
+                headers: { "token": localStorage.getItem("token") },
+                contentType: "application/json;charset=utf-8",
+                success: function (result, status, xmlhttp) {
+                    if (result.code == 0) {
+                        alert("评论添加成功");
+                    } else {
+                        alert("评论添加失败" + result.message);
+                    }
+                }
+            })
+        }
+        const queryList = function () {
+            $.ajax({
+                type: "get",
+                url: "http://127.0.0.1:8080/selectComment",
+                data:{courseId:this.courseId},
+                success: function (data) {
+                    try {
+                        throw new Error("accept");
+                    } catch (error) {
+                        console.error("accept:", error.message);
+                    }
+                    if (data.code == 0) {
+                        let html = '';
+                        data.data.forEach((v) => {
+
+                            html += `
+                        <tr>
+                            <td>${v.userName}</td>
+                            <td>${v.content}</td>
+                            
+                        </tr>
+                    `;
+                        });
+                        document.querySelector("#my-tbody").innerHTML = html;
+                    }
+                },
+            });
+        };
+
+        queryList();
+
+    </script>
+</body>
+
+</html>

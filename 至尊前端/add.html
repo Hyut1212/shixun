@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加课程</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-container input[type="text"],
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            display: block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>添加课程</h1>
+
+    <div class="form-container">
+        <form>
+            <label for="courseName">课程名称</label>
+            <input type="text" id="courseName" name="courseName" required>
+
+            <label for="teacherName">老师名称</label>
+            <input type="text" id="teacherName" name="teacherName" required>
+
+            <label for="courseType">课程类型</label>
+            <input type="text" id="courseType" name="courseType" required>
+
+            <label for="payType">付费类型</label>
+            <input type="text" id="payType" name="payType" required>
+
+
+            <button type="button" onclick="addCourse()">添加课程</button>
+        </form>
+    </div>
+    <script src="./js/jquery-1.7.2.min.js"></script>
+    <script>
+        function addCourse() {
+            var params = {};
+            params.courseName = $("#courseName").val();
+            params.teacherName = $("#teacherName").val();
+            params.courseType = $("#courseType").val();
+            params.payType = $("#payType").val();
+    
+            // 数据校验
+            // 校验参数
+            if (params.courseName == "") {
+                alert("课程名称不能为空");
+                return;
+            }
+    
+            if (params.teacherName == "") {
+                alert("老师名字不能为空");
+                return;
+            }
+    
+            if (params.courseType == "") {
+                alert("课程类型不能为空");
+                return;
+            }
+    
+            if (params.payType == "") {
+                alert("付费类型不能为空");
+                return;
+            }
+    
+            // 将数据发送到后台
+            $.ajax({
+                url: "http://localhost:8080/addCourse",
+                type: "post",
+                data: JSON.stringify(params),
+                headers: { "token": localStorage.getItem("token") },
+                contentType: "application/json;charset=utf-8",
+                success: function (result, status, xmlhttp) {
+                    if (result.code == 0) {
+                        alert("课程添加成功");
+                        window.location.href = "http://127.0.0.1:5500/frist.html";
+                    } else {
+                        alert("课程添加失败：" + result.message);
+                    }
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>

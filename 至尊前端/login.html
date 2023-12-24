@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        #form {
+
+            width: 370px;
+            margin:auto;
+             margin-top: 70px;
+            border: 1px solid #9c8f8f; 
+            padding: 20px;
+            border-radius: 8px;
+           background: #509498; 
+           opacity: .5;
+        }
+
+        .form-group {
+
+            margin-bottom: 35px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+
+        }
+
+        input {
+            height: 40px;
+            width: 350px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+
+        }
+
+        button {
+            display: block;
+            width: 300px;
+            height: 50px;
+            background: #0078d4;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+            margin: auto;
+
+        }
+
+        button:hover {
+            background: #0063ad;
+        }
+
+        body {
+            background-color: #74aabc;
+            background-image: url(https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg);
+            background-size: 100% 100%;
+             background-repeat: no-repeat;
+		/*background-size: cover;  */
+
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div id="form">
+
+        <div class="form-group">
+            <label for="phone-input">手机号：</label>
+            <input type="tel" id="phone-input" name="phone" placeholder="请输入手机号" required>
+        </div>
+        <div class="form-group">
+            <label for="password-input">密码：</label>
+            <input type="password" id="password-input" name="password" placeholder="请输入密码" required>
+        </div>
+        <div class="form-group">
+            <label for="captcha-input">验证码：</label>
+            <input type="text" id="captcha-input" name="captcha" placeholder="请输入验证码" required>
+            <br /><br />
+            <img id="image" src="captcha-image.jpg" onclick="abc()" alt="验证码">
+        </div>
+        <button onclick="login()">登录</button>
+        <br /><br />
+        <a href="./reg.html" style="font-size:20px;color:rgb(247, 2, 2);">没有账号？点击此处注册</a>
+        &nbsp; &nbsp; &nbsp; &nbsp;
+        <a href="./forget.html" style="font-size:20px;color:rgb(247, 2, 2);">忘记密码</a>
+    </div>
+    <script>
+        function abc() {
+            $.ajax({
+                url: "http://localhost:8080/imageCode",
+                success: function (result, status, xmlhttp) {
+                    if (result.code == 0) {
+                        var key = xmlhttp.getResponseHeader("key");
+                        sessionStorage.setItem("key", key);
+                        $("#image").attr("src", result.data);
+                    }
+                }
+            })
+        }
+        abc();
+
+        function login() {
+            var params = {};
+            params.phone = $("#phone-input").val();
+            params.password = $("#password-input").val();
+            params.code = $("#captcha-input").val();
+            // 数据校验
+            // 校验参数
+            if (params.phone == "") {
+                alert("手机号不能为空");
+                return;
+            }
+            var regExp = /((13[4-9])|(14[47])|(15[0-35-9])|(16[567])|(17[2-8])|(18[0-49])|(19[579]))\d{8}/
+            if (!regExp.test(params.phone)) {
+                alert("手机号不符合规范");
+                return;
+            }
+            // 密码校验
+
+            // 将数据发送到后台去
+            $.ajax({
+                url: "http://localhost:8080/login",
+                type: "post",
+                data: JSON.stringify(params),
+                headers: { "key": sessionStorage.getItem("key") },
+                contentType: "application/json;charset=utf-8",
+                success: function (result, status, xmlhttp) {
+                    if (result.code == 0) {
+                        var token = xmlhttp.getResponseHeader("token");
+                        localStorage.setItem("token", token);
+                        window.location.href = "http://127.0.0.1:5500/frist.html";
+                    }
+                    alert(result.message)
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title><!--网页标题-->
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        #form {
+            width: 370px;
+            margin: auto;
+            margin-top: 70px;
+            border: 1px solid #9c8f8f; 
+            padding: 20px;
+            border-radius: 8px;
+            background: #f5f2f2; 
+            opacity: .7;
+        } 
+
+       .form-group {
+     
+            margin-bottom: 35px;
+        }  
+
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+      
+        }
+
+        input {
+            height: 40px;
+            width: 350px;
+            padding: 10px;
+             border: 1px solid #ccc; 
+            border-radius: 4px;
+            font-size: 16px;
+ 
+        }
+
+        button {
+            display: block;
+            width: 300px;
+            height: 50px;
+            background: #0078d4;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+            margin: auto;
+  
+        }
+
+        button:hover {
+            background: #0063ad;
+        }
+        body {
+		background-color: #74aabc;
+        background-image: url(https://ts1.cn.mm.bing.net/th/id/R-C.15e970cd0765096178a6da16993cfbb1?rik=IT5KfevidZcTig&riu=http%3a%2f%2fimg.pconline.com.cn%2fimages%2fupload%2fupc%2ftx%2fwallpaper%2f1210%2f22%2fc0%2f14558824_1350879506501.jpg&ehk=X9ro%2fg%2fGTmsglVrbV%2bmy8c3wsAvcHseqcEhsf80RMWA%3d&risl=&pid=ImgRaw&r=0) ;
+        background-size: 100% 100%;
+	     background-repeat: no-repeat;
+		/* background-size: cover;  */
+ 
+	    }
+
+    </style>
+</head>
+
+<body >
+    <div id="form">
+        <div class="form-group">
+            <label for="phone" style="color:rgb(6, 6, 6);"> 手机号:</label>
+            <input type="tel" id="phone-input" name="phone" placeholder="请输入手机号" required>
+        </div>
+        <div class="form-group">
+           
+            <label for="pwd">密码:</label>
+            <input type="password" id="password-input" name="password" placeholder="请输入密码" required>
+        </div>
+        <div class="form-group">
+           
+            <label for="smscode">验证码:</label>
+            <input type="text" id="captcha-input" name="captcha" placeholder="请输入验证码" required>
+        </div>
+        <div class="form-group">
+         
+            <button type="button" style="color:rgb(241, 238, 238);"onclick="sendSMS()">发送验证码</button>
+        </div>
+        <div class="form-group">
+        
+            <input type="button" style="font-size:20px;color:rgb(8, 7, 7);" value="注册" onclick="reg()">
+        </div>
+         <div class="form-group">
+            <br /><br/>
+            <a href="./login.html" style="font-size:20px;color:rgb(251, 4, 4);">已有账号，点击此处登陆</a>
+    </div>
+    
+</body>
+<script>
+    /**
+     * 发送短信
+     */
+    function sendSMS() {
+        // 1、数据校验
+        let phone = $("#phone-input").val();
+        console.log(phone)
+        if (!phone) {
+            alert("请输入手机号")
+            return;
+        }
+        // 2、请求
+        //jquery 的ajax
+        $.ajax({
+            url: "http://localhost:8080/sendSMS",
+            data: {
+                "phone": $("#phone-input").val()
+            }, //参数  上面onclick输入的手机号 .val 表示方法，返回的就是我输入的内容
+
+            //请求到了，参数也到了 接下来就到了服务器了，然后就回到服务器进行处理
+            success: function (result, status, xmlhttp) {
+                if (result.code == 0) {
+                    var key = xmlhttp.getResponseHeader("key");
+                    //localStorage  本地存储， 只要不清楚浏览器缓存就不会消失  sessionStorage 会话存储  会话结束内容消失
+                    sessionStorage.setItem("key", key);
+                    alert(result.message)
+                }
+            }
+        })
+
+    }
+
+    // 注册
+    function reg() {
+        // let key = sessionStorage.getItem("key");
+        // console.log(key)
+
+        var params = {};
+        //将上面输入框的内容赋值给了我这个params 属性
+        params.phone = $("#phone-input").val();
+        params.password = $("#password-input").val();
+        params.code=$("#captcha-input").val()
+        //校验参数
+        if (params.phone == ""){
+            alert("手机号不能为空")
+        }
+        var regExp =  /^1[3456789]\d{9}$/
+        if (!regExp.test(params.phone)){
+            alert("手机号不符合格式");
+            return
+        }
+
+        //密码和验证码也需要类似的校验
+        $.ajax({
+            url: "http://localhost:8080/reg",
+            type:"post",
+            headers: {"key":sessionStorage.getItem("key")},// 添加一个请求头
+            data: JSON.stringify(params), //参数转换成json字符串
+            contentType: "application/json;charset=utf-8", // 请求的内容类型是json
+            success: function (result){
+                debugger
+                alert(result.message) //现在请求已经发送到后台了，是不是后台有一个方法来接收请求
+            }
+        })
+
+    }
+    
+</script>
+
+</html>
